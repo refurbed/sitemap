@@ -36,6 +36,14 @@ type URL struct {
 	LastMod    *time.Time `xml:"lastmod,omitempty"`
 	ChangeFreq ChangeFreq `xml:"changefreq,omitempty"`
 	Priority   float32    `xml:"priority,omitempty"`
+	Alternates []*AltURL  `xml:"xhtml:link"`
+}
+
+type AltURL struct {
+	XMLName  xml.Name `xml:"xhtml:link"`
+	Rel      string   `xml:"rel,attr"`
+	HrefLang string   `xml:"hreflang,attr"`
+	Loc      string   `xml:"href,attr"`
 }
 
 // Sitemap represents a complete sitemap which can be marshaled to XML.
@@ -43,10 +51,10 @@ type URL struct {
 // attribute correctly. Minify can be set to make the output less human
 // readable.
 type Sitemap struct {
-	XMLName xml.Name `xml:"urlset"`
-	Xmlns   string   `xml:"xmlns,attr"`
-
-	URLs []*URL `xml:"url"`
+	XMLName    xml.Name `xml:"urlset"`
+	Xmlns      string   `xml:"xmlns,attr"`
+	XmlnsXHtml string   `xml:"xmlns:xhtml,attr"`
+	URLs       []*URL   `xml:"url"`
 
 	Minify bool `xml:"-"`
 }
@@ -54,13 +62,17 @@ type Sitemap struct {
 // New returns a new Sitemap.
 func New() *Sitemap {
 	return &Sitemap{
-		Xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9",
-		URLs:  make([]*URL, 0),
+		Xmlns:      "http://www.sitemaps.org/schemas/sitemap/0.9",
+		XmlnsXHtml: "https://www.w3.org/1999/xhtml",
+		URLs:       make([]*URL, 0),
 	}
 }
 
 // Add adds an URL to a Sitemap.
 func (s *Sitemap) Add(u *URL) {
+	for _, altU := range u.Alternates {
+		altU.Rel = "alternate"
+	}
 	s.URLs = append(s.URLs, u)
 }
 
