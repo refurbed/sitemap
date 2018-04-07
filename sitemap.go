@@ -63,7 +63,7 @@ type Sitemap struct {
 func New() *Sitemap {
 	return &Sitemap{
 		Xmlns:      "http://www.sitemaps.org/schemas/sitemap/0.9",
-		XmlnsXHtml: "https://www.w3.org/1999/xhtml",
+		XmlnsXHtml: "http://www.w3.org/1999/xhtml",
 		URLs:       make([]*URL, 0),
 	}
 }
